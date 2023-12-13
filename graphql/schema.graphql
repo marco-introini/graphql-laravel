@@ -24,25 +24,41 @@ type Query {
         name: String @where(operator: "like")
     ): [User!]! @paginate(defaultCount: 10)
 
+    "List tasks of a user"
+    tasks(
+        user_id: Int! @where
+    ): [Task]! @all
 }
 
 "Account of a person who utilizes this application."
 type User {
     "Unique primary key."
     id: ID!
-
     "Non-unique name."
     name: String!
-
     "Unique email address."
     email: String!
-
     "When the email was verified."
     email_verified_at: DateTime
-
     "When the account was created."
     created_at: DateTime!
-
     "When the account was last updated."
     updated_at: DateTime!
+}
+
+"Task"
+type Task {
+    id: ID!
+    name: String!
+    user: [User]!
+}
+
+type Mutation {
+    createTask(input: TaskInput! @spread): Task @create
+    updateTask(id: ID!, name: String!): Task @update
+    deleteTask(id: ID!): Task @delete
+}
+input TaskInput {
+    user_id: Int!
+    name: String! @rules(apply: ["string", "min:3"])
 }
